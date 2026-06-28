@@ -6,12 +6,13 @@
     <!-- Content-Security-Policy: restricts where scripts, styles, images and network calls may come from.
          'unsafe-inline'/'unsafe-eval' are required because the app uses inline handlers and Tailwind's CDN.
          If a needed resource is ever blocked, add its origin to the matching directive below. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://api.qrserver.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com https://accounts.google.com https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://api.qrserver.com https://*.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com; frame-src 'self' https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
     <title>SSMVP Portal • Vadtal Dham Perth</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
@@ -1000,9 +1001,14 @@
                             Show voided entries
                         </label>
                     </div>
-                    <button onclick="switchTab('auditlog')" class="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-2xl transition-all">
-                        <i data-lucide="scroll-text" class="w-4 h-4"></i> Full Audit Log
-                    </button>
+                    <div class="flex items-center gap-2 flex-wrap justify-end">
+                        <button onclick="exportLedgerPDF()" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
+                        <button onclick="exportLedgerCSV()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
+                        <button onclick="exportLedgerExcel()" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
+                        <button onclick="switchTab('auditlog')" class="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-2xl transition-all">
+                            <i data-lucide="scroll-text" class="w-4 h-4"></i> Full Audit Log
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -3547,6 +3553,160 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
     }
 
     // ====================== LEDGER ======================
+    // ====================== LEDGER EXPORT (PDF / CSV / Excel) ======================
+    // Mirrors the on-screen ledger filters so an export always matches what is shown.
+    function getLedgerFilteredForExport() {
+        const period     = document.getElementById('report-period').value;
+        const typeFilter = document.getElementById('report-type').value;
+        const from       = document.getElementById('date-from').value;
+        const to         = document.getElementById('date-to').value;
+        const showVoided = !!(document.getElementById('show-voided') && document.getElementById('show-voided').checked);
+
+        let filtered = entries.slice();
+        if (!showVoided) filtered = filtered.filter(e => !e.voided);
+        if (typeFilter !== 'all') filtered = filtered.filter(e => e.type === typeFilter);
+
+        const now = new Date();
+        if (period !== 'all' && period !== 'custom') {
+            filtered = filtered.filter(e => {
+                const d = new Date(e.date);
+                if (period === 'today')   return d.toDateString() === now.toDateString();
+                if (period === 'week')    { const s = new Date(now); s.setDate(now.getDate() - now.getDay()); return d >= s; }
+                if (period === 'month')   return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                if (period === 'quarter') { const q = Math.floor(now.getMonth()/3); return Math.floor(d.getMonth()/3) === q && d.getFullYear() === now.getFullYear(); }
+                if (period === 'year')    return d.getFullYear() === now.getFullYear();
+                if (period === 'fy2425')  return d >= new Date('2024-07-01') && d < new Date('2025-07-01');
+                if (period === 'fy2526')  return d >= new Date('2025-07-01') && d < new Date('2026-07-01');
+                if (period === 'fy2627')  return d >= new Date('2026-07-01') && d < new Date('2027-07-01');
+                return true;
+            });
+        } else if (period === 'custom' && from && to) {
+            filtered = filtered.filter(e => { const d = new Date(e.date); return d >= new Date(from) && d <= new Date(to); });
+        }
+
+        const labels = { today:'Today', week:'This Week', month:'This Month', quarter:'This Quarter', year:'This Year',
+                         fy2425:'FY 2024-25', fy2526:'FY 2025-26', fy2627:'FY 2026-27', all:'All Time',
+                         custom: (from && to) ? (from + ' to ' + to) : 'Custom Range' };
+        const typeLabel = typeFilter === 'income' ? 'Donations only' : (typeFilter === 'expense' ? 'Expenses only' : 'All transactions');
+        return { filtered: filtered, periodLabel: labels[period] || 'All Time', typeLabel: typeLabel };
+    }
+
+    function ledgerEntityName(e) {
+        if (e.type === 'income') {
+            return e.donorType === 'org' ? (e.orgName || e.firstName || '') : ((e.firstName || '') + ' ' + (e.lastName || '')).trim();
+        }
+        return e.vendorName || '';
+    }
+
+    function ledgerExportRows() {
+        return getLedgerFilteredForExport().filtered.map(function (e) {
+            return {
+                Date:              new Date(e.date).toLocaleDateString('en-AU'),
+                Time:              new Date(e.date).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }),
+                Type:              e.type === 'income' ? 'Donation' : 'Expense',
+                'Entity / Vendor': ledgerEntityName(e),
+                Contact:           e.type === 'income' ? (e.email || '') : (e.phone || ''),
+                Category:          e.category || '',
+                Subcategory:       e.subcategory || '',
+                Method:            e.method || '',
+                Reference:         e.ref || '',
+                Amount:            Number((e.type === 'income' ? 1 : -1) * (Number(e.amount) || 0)),
+                Status:            e.voided ? 'Voided' : 'Active',
+                'Recorded By':     e.recordedBy || ''
+            };
+        });
+    }
+
+    function ledgerFileName(ext) {
+        const d = new Date();
+        const pad = function (n) { return ('0' + n).slice(-2); };
+        return 'SSMVP_Ledger_' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.' + ext;
+    }
+
+    function ledgerDownloadBlob(content, filename, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    }
+
+    function ledgerLogExport(kind, n, periodLabel) {
+        try { audit('export_ledger', 'Ledger exported to ' + kind, n + ' rows | ' + periodLabel); } catch (e) {}
+    }
+
+    function exportLedgerCSV() {
+        const rows = ledgerExportRows();
+        if (!rows.length) { showToast('No transactions to export for this period.', 'amber'); return; }
+        const headers = Object.keys(rows[0]);
+        const esc = function (v) { v = (v === null || v === undefined) ? '' : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+        const csv = [headers.join(',')].concat(rows.map(function (r) { return headers.map(function (h) { return esc(r[h]); }).join(','); })).join('\r\n');
+        const meta = getLedgerFilteredForExport();
+        ledgerDownloadBlob('﻿' + csv, ledgerFileName('csv'), 'text/csv;charset=utf-8');
+        ledgerLogExport('CSV', rows.length, meta.periodLabel);
+        showToast('Ledger exported to CSV (' + rows.length + ' rows).', 'emerald');
+    }
+
+    function exportLedgerExcel() {
+        const rows = ledgerExportRows();
+        if (!rows.length) { showToast('No transactions to export for this period.', 'amber'); return; }
+        if (typeof XLSX === 'undefined') { showToast('Excel library is still loading - please try again in a moment.', 'amber'); return; }
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws['!cols'] = [{wch:11},{wch:7},{wch:10},{wch:24},{wch:22},{wch:16},{wch:16},{wch:12},{wch:14},{wch:11},{wch:9},{wch:16}];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Ledger');
+        XLSX.writeFile(wb, ledgerFileName('xlsx'));
+        const meta = getLedgerFilteredForExport();
+        ledgerLogExport('Excel', rows.length, meta.periodLabel);
+        showToast('Ledger exported to Excel (' + rows.length + ' rows).', 'emerald');
+    }
+
+    function exportLedgerPDF() {
+        const meta = getLedgerFilteredForExport();
+        const list = meta.filtered;
+        if (!list.length) { showToast('No transactions to export for this period.', 'amber'); return; }
+        if (!window.jspdf || !window.jspdf.jsPDF) { showToast('PDF library is still loading - please try again in a moment.', 'amber'); return; }
+        const JsPDF = window.jspdf.jsPDF;
+        const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+        doc.setFontSize(16); doc.setFont(undefined, 'bold');
+        doc.text('SSMVP - Financial Ledger', 14, 15);
+        doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(110);
+        doc.text('Period: ' + meta.periodLabel + '    |    ' + meta.typeLabel + '    |    Generated: ' + new Date().toLocaleString('en-AU'), 14, 21);
+        doc.setTextColor(0);
+
+        const body = list.map(function (e) {
+            return [
+                new Date(e.date).toLocaleDateString('en-AU'),
+                e.type === 'income' ? 'Donation' : 'Expense',
+                ledgerEntityName(e),
+                (e.category || '') + (e.subcategory ? ' / ' + e.subcategory : ''),
+                e.method || '',
+                (e.type === 'income' ? '+' : '-') + '$' + (Number(e.amount) || 0).toFixed(2),
+                e.voided ? 'Voided' : ''
+            ];
+        });
+        const income  = list.filter(function (e) { return !e.voided && e.type === 'income';  }).reduce(function (a, c) { return a + (Number(c.amount) || 0); }, 0);
+        const expense = list.filter(function (e) { return !e.voided && e.type === 'expense'; }).reduce(function (a, c) { return a + (Number(c.amount) || 0); }, 0);
+
+        doc.autoTable({
+            startY: 26,
+            head: [['Date', 'Type', 'Entity / Vendor', 'Classification', 'Method', 'Amount', 'Status']],
+            body: body,
+            styles: { fontSize: 8, cellPadding: 1.8 },
+            headStyles: { fillColor: [15, 23, 42] },
+            columnStyles: { 5: { halign: 'right' } },
+            alternateRowStyles: { fillColor: [248, 250, 252] }
+        });
+        const y = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 30) + 8;
+        doc.setFont(undefined, 'bold'); doc.setFontSize(10);
+        doc.text('Income: $' + income.toFixed(2) + '       Expense: $' + expense.toFixed(2) + '       Net: $' + (income - expense).toFixed(2), 14, y);
+        doc.save(ledgerFileName('pdf'));
+        ledgerLogExport('PDF', list.length, meta.periodLabel);
+        showToast('Ledger exported to PDF (' + list.length + ' rows).', 'emerald');
+    }
+
     function renderLedger() {
         const period      = document.getElementById('report-period').value;
         const typeFilter  = document.getElementById('report-type').value;
