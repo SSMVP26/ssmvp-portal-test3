@@ -412,7 +412,7 @@
                         <div id="donor-autofill-banner" class="hidden items-center gap-2 bg-orange-50 border border-orange-200 text-orange-700 text-xs font-bold px-4 py-2 rounded-2xl">
                             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
                             <span>Autofilled from directory</span>
-                            <button type="button" onclick="clearDonorAutofill()" class="ml-1 hover:text-red-500 font-black">✕</button>
+                            <button type="button" onclick="clearDonorAutofill()" class="ml-1 hover:text-red-500 font-black">✕ Clear</button>
                         </div>
                         <div id="org-autofill-banner" class="hidden items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold px-4 py-2 rounded-2xl">
                             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
@@ -453,7 +453,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">FIRST NAME <span class="text-red-400">*</span></label>
-                                <input id="in-fname" type="text"
+                                <input id="in-fname" type="text" oninput="if(!this.value.trim())clearDonorLinkedFields()"
                                     onfocus="revealDonorSearch()"
                                     class="input-focus w-full px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium"
                                     placeholder="First name">
@@ -1139,8 +1139,8 @@
                     <div class="flex items-center gap-3 mb-4"><div class="p-2.5 bg-red-100 text-red-600 rounded-xl"><i data-lucide="paperclip" class="w-5 h-5"></i></div><div><h4 class="font-bold">PDF Receipt Attached</h4><p class="text-xs text-slate-400">Auto-generated &amp; attached to every email</p></div></div>
                     <ul class="space-y-2 text-sm text-slate-600">
                         <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Vadtaldham logo embedded in PDF</li>
-                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Billed to, date, invoice no., payment method</li>
-                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>TOTAL (red) · Amount Paid · Amount Due</li>
+                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Issued to, date, invoice no., payment method</li>
+                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Subtotal · TOTAL (red)</li>
                         <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Also printable via 🖨 button in ledger</li>
                     </ul>
                 </div>
@@ -1891,7 +1891,7 @@
         <p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.85;color:#4A5568;">
           Thank you for your generous donation of <strong style="color:#8B1A1A;">{amount}</strong> to
           <strong style="color:#1A202C;">Shree Swaminarayan Mandir Vadtaldham Perth</strong> on
-          <strong style="color:#1A202C;">{date}</strong>. We are truly grateful for your kind support of our community.
+          <strong style="color:#1A202C;">{date}</strong>. We are truly grateful for your kind Support to the Community.
         </p>
         <p style="margin:0 0 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.85;color:#4A5568;">
           Your receipt <strong style="color:#1A202C;">({receipt_number})</strong> is attached to this email.
@@ -2023,7 +2023,7 @@
     // ====================== HELPERS ======================
     function findOrCreateDonor(firstName, lastName, email, phone) {
         let donor = donors.find(d =>
-            d.email.toLowerCase() === (email || '').toLowerCase() ||
+            (email && d.email && d.email.toLowerCase() === email.toLowerCase()) ||
             (d.firstName.toLowerCase() === firstName.toLowerCase() && d.lastName.toLowerCase() === lastName.toLowerCase())
         );
         if (!donor) {
@@ -2035,7 +2035,7 @@
 
     function findOrCreateVendor(name, email, phone) {
         let vendor = vendors.find(v =>
-            v.email.toLowerCase() === (email || '').toLowerCase() ||
+            (email && v.email && v.email.toLowerCase() === email.toLowerCase()) ||
             v.name.toLowerCase() === name.toLowerCase()
         );
         if (!vendor) {
@@ -2645,7 +2645,7 @@
         const dt = new Date(entry.date);
         // Always format in Perth timezone (AWST = UTC+8, no DST)
         const perthTZ = { timeZone: 'Australia/Perth' };
-        const date    = dt.toLocaleDateString('en-AU', perthTZ);
+        const date    = dt.toISOString();   // store full timestamp so the entry's time survives a reload
         const time    = dt.toLocaleTimeString('en-AU', { ...perthTZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
         let payload;
@@ -2787,7 +2787,7 @@ table.items tfoot td{padding:12px 16px;font-size:13px}
 <hr class="rule">
 <div class="info-row">
 <div class="billed">
-<div class="billed-lbl">Billed To</div>
+<div class="billed-lbl">Issued To</div>
 <div class="billed-name">${escHtml(d.donorName)}</div>
 <div class="billed-addr">${d.addrLines.map(l=>escHtml(l)).join('<br>')}</div>
 ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top:8px">Account Number: ${escHtml(String(d.entry.accountNumber))}</div>` : ''}
@@ -2807,8 +2807,6 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 <tfoot>
 <tr class="row-sub"><td>Subtotal</td><td class="r">$${d.amount}</td></tr>
 <tr class="row-total"><td>TOTAL</td><td class="r">$${d.amount}</td></tr>
-<tr class="row-paid"><td>Amount Paid</td><td class="r">$${d.amount}</td></tr>
-<tr class="row-due"><td>Amount Due</td><td class="r">$0.00</td></tr>
 </tfoot>
 </table>
 <hr class="rule" style="margin-top:28px">
@@ -2856,7 +2854,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         // Billed To + Meta
         const infoY = y;
         doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...LIGHT);
-        doc.text('BILLED TO', ml, y); y+=6;
+        doc.text('ISSUED TO', ml, y); y+=6;
         doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...DARK);
         doc.text(d.donorName, ml, y); y+=5.5;
         doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...MUTED);
@@ -2886,9 +2884,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 
         // Summary rows
         [{lbl:'Subtotal',val:'$'+d.amount,bold:false,col:MUTED,lc:[226,232,240],lw:0.3,line:true},
-         {lbl:'TOTAL',val:'$'+d.amount,bold:true,col:RED,lc:RED,lw:0.6,line:true},
-         {lbl:'Amount Paid',val:'$'+d.amount,bold:false,col:MUTED,lc:null,lw:0,line:false},
-         {lbl:'Amount Due',val:'$0.00',bold:true,col:DARK,lc:DARK,lw:0.6,line:true}
+         {lbl:'TOTAL',val:'$'+d.amount,bold:true,col:RED,lc:RED,lw:0.6,line:true}
         ].forEach(row => {
             if (row.line&&row.lc){ doc.setDrawColor(...row.lc); doc.setLineWidth(row.lw); doc.line(ml,y,W-mr,y); }
             y+=7; doc.setFont('helvetica',row.bold?'bold':'normal'); doc.setFontSize(row.bold?12:10.5); doc.setTextColor(...row.col);
@@ -3412,16 +3408,23 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
     }
 
     function clearDonorAutofill() {
-        document.getElementById('in-fname').value  = '';
-        document.getElementById('in-lname').value  = '';
-        document.getElementById('in-phone').value  = '';
-        document.getElementById('in-email').value  = '';
+        ['in-fname','in-lname','in-phone','in-email','in-address','in-suburb','in-postcode','in-xero-ref'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+        });
         if (document.getElementById('donor-smart-search'))
             document.getElementById('donor-smart-search').value = '';
         const banner = document.getElementById('donor-autofill-banner');
-        banner.classList.add('hidden');
-        banner.classList.remove('flex');
+        if (banner) { banner.classList.add('hidden'); banner.classList.remove('flex'); }
         document.getElementById('in-fname').focus();
+    }
+
+    // When the donor's name is cleared, drop the linked details that were auto-filled with it.
+    function clearDonorLinkedFields() {
+        ['in-lname','in-phone','in-email','in-address','in-suburb','in-postcode','in-xero-ref'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+        });
+        const banner = document.getElementById('donor-autofill-banner');
+        if (banner) { banner.classList.add('hidden'); banner.classList.remove('flex'); }
     }
 
     // Called from Donor Directory "New Donation" button
