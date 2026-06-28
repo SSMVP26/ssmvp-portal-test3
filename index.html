@@ -833,6 +833,15 @@
                     </div>
                 </div>
 
+                <div class="card bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                    <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">EXPENSE DATE &amp; TIME <span class="text-slate-400 font-normal normal-case text-xs tracking-normal">— change only if backdating</span></label>
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <input id="ex-date" type="date" class="input-focus px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium">
+                        <input id="ex-time" type="time" class="input-focus px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium">
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2">Defaults to now (Perth time). Change if recording a past expense.</p>
+                </div>
+
                 <div class="flex justify-end pt-4">
                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-14 rounded-3xl text-sm uppercase tracking-widest shadow-xl transition-all">Submit Expense Record</button>
                 </div>
@@ -860,6 +869,11 @@
                     </button>
                 </div>
             </header>
+            <div class="flex justify-end gap-2 mb-4">
+                <button onclick="exportDirPDF('Donors')" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
+                <button onclick="exportDirCSV('Donors')" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
+                <button onclick="exportDirExcel('Donors')" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
+            </div>
             <div id="donor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
@@ -891,6 +905,11 @@
                     <strong>Important:</strong> Shree Swaminarayan Mandir Vadtaldham Perth Inc. is <strong>not</strong> registered for Deductible Gift Recipient (DGR). Donations are <strong>not tax deductible</strong> under the DGR scheme. No tax receipts are issued to organisations or individuals.
                 </div>
             </div>
+            <div class="flex justify-end gap-2 mb-4">
+                <button onclick="exportDirPDF('Organisations')" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
+                <button onclick="exportDirCSV('Organisations')" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
+                <button onclick="exportDirExcel('Organisations')" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
+            </div>
             <div id="org-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
@@ -911,6 +930,11 @@
                     </button>
                 </div>
             </header>
+            <div class="flex justify-end gap-2 mb-4">
+                <button onclick="exportDirPDF('Vendors')" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
+                <button onclick="exportDirCSV('Vendors')" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
+                <button onclick="exportDirExcel('Vendors')" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
+            </div>
             <div id="vendor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
@@ -2056,6 +2080,10 @@
         if (dd) dd.value = _now.toLocaleDateString('en-CA', _perthTZ); // YYYY-MM-DD in Perth
         const dt2 = document.getElementById('in-donation-time');
         if (dt2) dt2.value = _now.toLocaleTimeString('en-AU', { ..._perthTZ, hour: '2-digit', minute: '2-digit', hour12: false });
+        const exd = document.getElementById('ex-date');
+        if (exd) exd.value = _now.toLocaleDateString('en-CA', _perthTZ);
+        const ext = document.getElementById('ex-time');
+        if (ext) ext.value = _now.toLocaleTimeString('en-AU', { ..._perthTZ, hour: '2-digit', minute: '2-digit', hour12: false });
         populateCategories('income');
         populateCategories('expense');
         updateSubcats('income');
@@ -2333,18 +2361,19 @@
         if (!document.getElementById(`${prefix}-method`).value) { showToast('Please select a payment method.', 'red'); return; }
 
         const now = new Date();
-        const donationDateEl  = document.getElementById('in-donation-date');
-        const donationTimeEl  = document.getElementById('in-donation-time');
-        // Build Perth-local date/time string YYYY-MM-DD in Perth timezone
+        const _dateEl = document.getElementById(type === 'income' ? 'in-donation-date' : 'ex-date');
+        const _timeEl = document.getElementById(type === 'income' ? 'in-donation-time' : 'ex-time');
         const todayPerth = now.toLocaleDateString('en-CA', { timeZone: 'Australia/Perth' });
-        const donationDateVal = (type === 'income' && donationDateEl && donationDateEl.value) ? donationDateEl.value : null;
-        const isBackdated = donationDateVal && (donationDateVal !== todayPerth);
+        const pickedDate = (_dateEl && _dateEl.value) ? _dateEl.value : null;   // YYYY-MM-DD
+        const pickedTime = (_timeEl && _timeEl.value) ? _timeEl.value : null;   // HH:MM
+        const isBackdated = pickedDate && (pickedDate !== todayPerth);
         let entryDate;
         if (isBackdated) {
-            // Backdated entry — use Perth noon so the date is correct
-            entryDate = new Date(donationDateVal + 'T12:00:00+08:00');
+            // Backdated entry — use the chosen time (or Perth noon if none), in Perth time.
+            const _t = (pickedTime && /^\d{2}:\d{2}/.test(pickedTime)) ? (pickedTime.length === 5 ? pickedTime + ':00' : pickedTime) : '12:00:00';
+            entryDate = new Date(pickedDate + 'T' + _t + '+08:00');
         } else {
-            // Today's entry — use actual current moment (has real time)
+            // Today's entry — use the actual current moment (real time).
             entryDate = now;
         }
         const entry = {
@@ -2502,6 +2531,10 @@
         if (rdd) rdd.value = _rnow.toLocaleDateString('en-CA', _rptz);
         const rdt = document.getElementById('in-donation-time');
         if (rdt) rdt.value = _rnow.toLocaleTimeString('en-AU', { ..._rptz, hour: '2-digit', minute: '2-digit', hour12: false });
+        const rxd = document.getElementById('ex-date');
+        if (rxd) rxd.value = _rnow.toLocaleDateString('en-CA', _rptz);
+        const rxt = document.getElementById('ex-time');
+        if (rxt) rxt.value = _rnow.toLocaleTimeString('en-AU', { ..._rptz, hour: '2-digit', minute: '2-digit', hour12: false });
         setDonorType('individual');
         ['in-address','in-suburb','in-postcode','in-xero-ref',
          'in-org-address','in-org-suburb','in-org-postcode','in-org-xero',
@@ -2638,6 +2671,20 @@
         }
     }
 
+    // ── Delete a directory row from the Sheet (donor / vendor / org / sant) ──
+    async function deleteRowFromCloud(target, rowId) {
+        if (!syncConfig.enabled || !syncConfig.url) return;
+        try {
+            await fetch(syncConfig.url, {
+                method:  'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body:    JSON.stringify({ tab: '__delete_row__', target: target, rowId: String(rowId), key: await authToken() })
+            });
+        } catch (err) {
+            console.error('Cloud delete failed:', err);
+        }
+    }
+
     // ── Main entry push (Donations / Expenses) ──
     async function pushToCloud(entry) {
         if (!syncConfig.enabled || !syncConfig.url) return;
@@ -2645,7 +2692,7 @@
         const dt = new Date(entry.date);
         // Always format in Perth timezone (AWST = UTC+8, no DST)
         const perthTZ = { timeZone: 'Australia/Perth' };
-        const date    = dt.toISOString();   // store full timestamp so the entry's time survives a reload
+        const date    = dt.toLocaleDateString('en-CA', perthTZ) + 'T' + dt.toLocaleTimeString('en-GB', { ...perthTZ, hour12: false }) + '+08:00';   // Perth-local timestamp so the entry time survives a reload
         const time    = dt.toLocaleTimeString('en-AU', { ...perthTZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
         let payload;
@@ -3549,6 +3596,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         const sant = santos.find(s => s.id === id);
         if (!confirm("Delete this Sant?")) return;
         santos = santos.filter(s => s.id !== id);
+        deleteRowFromCloud('Santas', String(id));
         saveToStorage();
         renderSantos();
         audit('sant_deleted', `Deleted Sant "${sant ? sant.name : id}"`);
@@ -3556,6 +3604,63 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
     }
 
     // ====================== LEDGER ======================
+    // ====================== DIRECTORY EXPORT (Donors / Vendors / Organisations) ======================
+    function directoryRows(kind) {
+        if (kind === 'Donors') return donors.map(function (d) { return {
+            'Donor ID': d.id, 'First Name': d.firstName || '', 'Last Name': d.lastName || '',
+            Email: d.email || '', Phone: d.phone || '', Address: d.address || '', Suburb: d.suburb || '',
+            Postcode: d.postcode || '', 'Xero Ref': d.xeroRef || '',
+            'Total Donated': Number(d.total || 0), 'Donations': Number(d.count || 0) }; });
+        if (kind === 'Vendors') return vendors.map(function (v) { return {
+            'Vendor ID': v.id, 'Vendor Name': v.name || '', Email: v.email || '', Phone: v.phone || '',
+            Address: v.address || '', Suburb: v.suburb || '', Postcode: v.postcode || '',
+            'Total Paid': Number(v.total || 0), 'Payments': Number(v.count || 0) }; });
+        if (kind === 'Organisations') return orgs.map(function (o) { return {
+            'Org ID': o.id, Name: o.name || '', ABN: o.abn || '', 'Contact Person': o.contactPerson || '',
+            Email: o.email || '', Phone: o.phone || '', Address: o.address || '', Suburb: o.suburb || '',
+            Postcode: o.postcode || '', 'Xero Ref': o.xeroRef || '',
+            'Total Donated': Number(o.total || 0), 'Donations': Number(o.count || 0) }; });
+        return [];
+    }
+    function directoryFileName(kind, ext) {
+        const d = new Date(); const p = function (n) { return ('0' + n).slice(-2); };
+        return 'SSMVP_' + kind + '_' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '.' + ext;
+    }
+    function exportDirCSV(kind) {
+        const rows = directoryRows(kind);
+        if (!rows.length) { showToast('Nothing to export yet.', 'amber'); return; }
+        const headers = Object.keys(rows[0]);
+        const esc = function (v) { v = (v == null) ? '' : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+        const csv = [headers.join(',')].concat(rows.map(function (r) { return headers.map(function (h) { return esc(r[h]); }).join(','); })).join('\r\n');
+        ledgerDownloadBlob('﻿' + csv, directoryFileName(kind, 'csv'), 'text/csv;charset=utf-8');
+        showToast(kind + ' exported to CSV (' + rows.length + ' rows).', 'emerald');
+    }
+    function exportDirExcel(kind) {
+        const rows = directoryRows(kind);
+        if (!rows.length) { showToast('Nothing to export yet.', 'amber'); return; }
+        if (typeof XLSX === 'undefined') { showToast('Excel library is still loading - try again in a moment.', 'amber'); return; }
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, kind);
+        XLSX.writeFile(wb, directoryFileName(kind, 'xlsx'));
+        showToast(kind + ' exported to Excel (' + rows.length + ' rows).', 'emerald');
+    }
+    function exportDirPDF(kind) {
+        const rows = directoryRows(kind);
+        if (!rows.length) { showToast('Nothing to export yet.', 'amber'); return; }
+        if (!window.jspdf || !window.jspdf.jsPDF) { showToast('PDF library is still loading - try again in a moment.', 'amber'); return; }
+        const JsPDF = window.jspdf.jsPDF;
+        const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        doc.setFontSize(16); doc.setFont(undefined, 'bold'); doc.text('SSMVP - ' + kind, 14, 15);
+        doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(110);
+        doc.text('Generated: ' + new Date().toLocaleString('en-AU') + '    |    ' + rows.length + ' records', 14, 21);
+        doc.setTextColor(0);
+        const headers = Object.keys(rows[0]);
+        const body = rows.map(function (r) { return headers.map(function (h) { return (r[h] == null ? '' : String(r[h])); }); });
+        doc.autoTable({ startY: 26, head: [headers], body: body, styles: { fontSize: 7, cellPadding: 1.5 }, headStyles: { fillColor: [15, 23, 42] }, alternateRowStyles: { fillColor: [248, 250, 252] } });
+        doc.save(directoryFileName(kind, 'pdf'));
+        showToast(kind + ' exported to PDF (' + rows.length + ' rows).', 'emerald');
+    }
+
     // ====================== LEDGER EXPORT (PDF / CSV / Excel) ======================
     // Mirrors the on-screen ledger filters so an export always matches what is shown.
     function getLedgerFilteredForExport() {
@@ -5168,8 +5273,10 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 
     function deleteOrg(id) {
         const o = orgs.find(x => x.id === id);
+        if (!o) return;
         if (!confirm(`Remove "${o.name}" from the Organisation Directory?`)) return;
         orgs = orgs.filter(x => x.id !== id);
+        deleteRowFromCloud('Organisations', id);
         saveToStorage();
         renderOrgs();
         audit('org_deleted', `Deleted organisation "${o.name}"`, `ABN: ${o.abn || 'N/A'} · Email: ${o.email || 'N/A'}`);
@@ -5189,7 +5296,16 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
             .replace(/{category}/g,      '[Category]')
             .replace(/{method}/g,        '[Method]')
             .replace(/{receipt_number}/g,'[RC-XXXXX]');
-        alert(`Subject: ${tmpl.subject}\n\n${body}`);
+        const win = window.open('', '_blank', 'width=720,height=900');
+        if (win) {
+            win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + escHtml(tmpl.subject) + '</title></head><body style="margin:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif">' +
+                '<div style="max-width:680px;margin:24px auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">' +
+                '<div style="background:#0f172a;color:#fff;padding:16px 24px;font-weight:700">' + escHtml(tmpl.subject) + '</div>' +
+                '<div style="padding:24px">' + body + '</div></div></body></html>');
+            win.document.close();
+        } else {
+            alert('Subject: ' + tmpl.subject + '\n\n' + body.replace(/<[^>]+>/g, ''));
+        }
     }
 
     // ====================== EMAIL TEMPLATES ======================
@@ -5337,6 +5453,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (!d) return;
         if (!confirm(`Remove "${d.firstName} ${d.lastName}" from the Donor Directory?\n\nThis will not delete their donation history.`)) return;
         donors = donors.filter(x => x.id !== id);
+        deleteRowFromCloud('Donors', id);
         saveToStorage();
         updateDonorDatalist();
         renderDonors();
@@ -5925,6 +6042,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (!v) return;
         if (!confirm(`Remove "${v.name}" from the Vendor Directory?\n\nThis will not delete their expense history.`)) return;
         vendors = vendors.filter(x => x.id !== id);
+        deleteRowFromCloud('Vendors', id);
         saveToStorage();
         updateVendorDatalist();
         renderVendors();
