@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Content-Security-Policy: restricts where scripts, styles, images and network calls may come from.
-         'unsafe-inline'/'unsafe-eval' are required because the app uses inline handlers and Tailwind's CDN.
-         If a needed resource is ever blocked, add its origin to the matching directive below. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdnjs.cloudflare.com https://accounts.google.com https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://api.qrserver.com https://*.googleusercontent.com https://www.gstatic.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com; frame-src 'self' https://accounts.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
     <title>SSMVP Portal • Vadtal Dham Perth</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
@@ -123,7 +118,6 @@
 <body class="bg-zinc-100 text-slate-900 min-h-screen">
 
 <!-- ===================== LOGIN SCREEN ===================== -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <div id="login-screen">
     <div class="login-card login-fadein">
         <!-- Logo -->
@@ -144,13 +138,13 @@
             <div style="display:flex;flex-direction:column;gap:14px">
                 <div>
                     <label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-bottom:8px">EMAIL ADDRESS</label>
-                    <input id="login-email" type="email" autocomplete="off" class="login-input" placeholder="Email address"
+                    <input id="login-email" type="email" autocomplete="email" class="login-input" placeholder="donations@vadtaldhamperth.org"
                         onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
                 </div>
                 <div>
                     <label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-bottom:8px">PASSWORD</label>
                     <div style="position:relative">
-                        <input id="login-password" type="password" autocomplete="off" class="login-input" placeholder="••••••••"
+                        <input id="login-password" type="password" autocomplete="current-password" class="login-input" placeholder="••••••••"
                             onkeydown="if(event.key==='Enter')loginStep1()" style="padding-right:52px">
                         <button type="button" onclick="togglePwVisibility()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;padding:4px">
                             <i data-lucide="eye" id="pw-eye-icon" style="width:18px;height:18px"></i>
@@ -159,14 +153,6 @@
                 </div>
                 <div id="login-step1-error" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:10px 14px;color:#fca5a5;font-size:13px;font-weight:600"></div>
                 <button class="login-btn" onclick="loginStep1()" style="margin-top:6px">Continue →</button>
-                <!-- Sign in with Google -->
-                <div id="google-divider" style="display:flex;align-items:center;gap:12px;margin:18px 0 14px">
-                    <div style="flex:1;height:1px;background:rgba(255,255,255,0.12)"></div>
-                    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.35)">OR</div>
-                    <div style="flex:1;height:1px;background:rgba(255,255,255,0.12)"></div>
-                </div>
-                <div id="google-signin-btn" style="display:flex;justify-content:center"></div>
-                <div id="google-signin-error" style="display:none;margin-top:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:10px 14px;color:#fca5a5;font-size:13px;font-weight:600"></div>
             </div>
             <div style="text-align:center;margin-top:20px;font-size:12px;color:rgba(255,255,255,0.25)">
                 Protected by two-factor authentication (MFA)
@@ -412,7 +398,7 @@
                         <div id="donor-autofill-banner" class="hidden items-center gap-2 bg-orange-50 border border-orange-200 text-orange-700 text-xs font-bold px-4 py-2 rounded-2xl">
                             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
                             <span>Autofilled from directory</span>
-                            <button type="button" onclick="clearDonorAutofill()" class="ml-1 hover:text-red-500 font-black">✕ Clear</button>
+                            <button type="button" onclick="clearDonorAutofill()" class="ml-1 hover:text-red-500 font-black">✕</button>
                         </div>
                         <div id="org-autofill-banner" class="hidden items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold px-4 py-2 rounded-2xl">
                             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
@@ -453,7 +439,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">FIRST NAME <span class="text-red-400">*</span></label>
-                                <input id="in-fname" type="text" oninput="if(!this.value.trim())clearDonorLinkedFields()"
+                                <input id="in-fname" type="text"
                                     onfocus="revealDonorSearch()"
                                     class="input-focus w-full px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium"
                                     placeholder="First name">
@@ -502,6 +488,12 @@
                                     class="input-focus w-full px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium font-mono"
                                     placeholder="e.g. INV-0042">
                             </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">IN HONOUR OF <span class="text-slate-400 font-normal normal-case">(optional — e.g. a child's name for a birthday donation)</span></label>
+                                <input id="in-honour-of" type="text"
+                                    class="input-focus w-full px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium"
+                                    placeholder="e.g. Aarav's 5th birthday">
+                            </div>
                         </div>
                     </div>
 
@@ -530,8 +522,8 @@
                                     placeholder="Organisation name">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">ABN <span class="text-red-400">*</span></label>
-                                <input id="in-org-abn" required type="text"
+                                <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">ABN <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                                <input id="in-org-abn" type="text"
                                     class="input-focus w-full px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium font-mono"
                                     placeholder="12 345 678 901">
                             </div>
@@ -833,15 +825,6 @@
                     </div>
                 </div>
 
-                <div class="card bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-                    <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">EXPENSE DATE &amp; TIME <span class="text-slate-400 font-normal normal-case text-xs tracking-normal">— change only if backdating</span></label>
-                    <div class="flex flex-wrap gap-3 items-center">
-                        <input id="ex-date" type="date" class="input-focus px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium">
-                        <input id="ex-time" type="time" class="input-focus px-6 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium">
-                    </div>
-                    <p class="text-xs text-slate-400 mt-2">Defaults to now (Perth time). Change if recording a past expense.</p>
-                </div>
-
                 <div class="flex justify-end pt-4">
                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-14 rounded-3xl text-sm uppercase tracking-widest shadow-xl transition-all">Submit Expense Record</button>
                 </div>
@@ -869,11 +852,6 @@
                     </button>
                 </div>
             </header>
-            <div class="flex justify-end gap-2 mb-4">
-                <button onclick="exportDirPDF('Donors')" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
-                <button onclick="exportDirCSV('Donors')" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
-                <button onclick="exportDirExcel('Donors')" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
-            </div>
             <div id="donor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
@@ -905,11 +883,6 @@
                     <strong>Important:</strong> Shree Swaminarayan Mandir Vadtaldham Perth Inc. is <strong>not</strong> registered for Deductible Gift Recipient (DGR). Donations are <strong>not tax deductible</strong> under the DGR scheme. No tax receipts are issued to organisations or individuals.
                 </div>
             </div>
-            <div class="flex justify-end gap-2 mb-4">
-                <button onclick="exportDirPDF('Organisations')" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
-                <button onclick="exportDirCSV('Organisations')" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
-                <button onclick="exportDirExcel('Organisations')" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
-            </div>
             <div id="org-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
@@ -930,11 +903,6 @@
                     </button>
                 </div>
             </header>
-            <div class="flex justify-end gap-2 mb-4">
-                <button onclick="exportDirPDF('Vendors')" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
-                <button onclick="exportDirCSV('Vendors')" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
-                <button onclick="exportDirExcel('Vendors')" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
-            </div>
             <div id="vendor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
@@ -1025,14 +993,9 @@
                             Show voided entries
                         </label>
                     </div>
-                    <div class="flex items-center gap-2 flex-wrap justify-end">
-                        <button onclick="exportLedgerPDF()" class="flex items-center gap-2 text-xs font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> PDF</button>
-                        <button onclick="exportLedgerCSV()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> CSV</button>
-                        <button onclick="exportLedgerExcel()" class="flex items-center gap-2 text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-2xl transition-all"><i data-lucide="download" class="w-4 h-4"></i> Excel</button>
-                        <button onclick="switchTab('auditlog')" class="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-2xl transition-all">
-                            <i data-lucide="scroll-text" class="w-4 h-4"></i> Full Audit Log
-                        </button>
-                    </div>
+                    <button onclick="switchTab('auditlog')" class="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-2xl transition-all">
+                        <i data-lucide="scroll-text" class="w-4 h-4"></i> Full Audit Log
+                    </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -1163,8 +1126,8 @@
                     <div class="flex items-center gap-3 mb-4"><div class="p-2.5 bg-red-100 text-red-600 rounded-xl"><i data-lucide="paperclip" class="w-5 h-5"></i></div><div><h4 class="font-bold">PDF Receipt Attached</h4><p class="text-xs text-slate-400">Auto-generated &amp; attached to every email</p></div></div>
                     <ul class="space-y-2 text-sm text-slate-600">
                         <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Vadtaldham logo embedded in PDF</li>
-                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Issued to, date, invoice no., payment method</li>
-                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Subtotal · TOTAL (red)</li>
+                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Billed to, date, invoice no., payment method</li>
+                        <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>TOTAL (red) · Amount Paid · Amount Due</li>
                         <li class="flex gap-2 items-start"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5"></i>Also printable via 🖨 button in ledger</li>
                     </ul>
                 </div>
@@ -1569,8 +1532,8 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">ABN <span class="text-red-400">*</span></label>
-                        <input id="modal-org-abn" required type="text" placeholder="12 345 678 901"
+                        <label class="block text-xs font-bold text-slate-500 mb-2 tracking-widest">ABN <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                        <input id="modal-org-abn" type="text" placeholder="12 345 678 901"
                             class="input-focus w-full px-5 py-4 bg-zinc-50 border border-slate-200 rounded-2xl font-medium font-mono">
                     </div>
                     <div>
@@ -1844,6 +1807,32 @@
     });
 
     let entries    = JSON.parse(safeStorage.getItem('ssmvp_entries')  || '[]');
+
+    /* ───── Directory + ledger sorting (added) ───── */
+    var dirSort = { donors:'az', orgs:'az', vendors:'az' };
+    var dirView = { donors:'cards', orgs:'cards', vendors:'cards' };
+    var ledgerSort = 'date';
+    function applyDirSort(arr, which, getName, getDate){
+        var d = dirSort[which] || 'az';
+        if (d === 'recent' && getDate){
+            arr.sort(function(a,b){ return new Date(getDate(b)||0) - new Date(getDate(a)||0); });
+        } else {
+            arr.sort(function(a,b){ var r = String(getName(a)||'').localeCompare(String(getName(b)||''), undefined, {sensitivity:'base'}); return d === 'za' ? -r : r; });
+        }
+        return arr;
+    }
+    function ledgerEntryName(e){
+        if (e.type === 'income') return (e.donorType === 'org' ? (e.orgName || e.firstName || '') : ((e.firstName||'') + ' ' + (e.lastName||'')));
+        return e.vendorName || '';
+    }
+    function applyLedgerSort(arr){
+        var s = ledgerSort || 'date';
+        if (s === 'name-az') arr.sort(function(a,b){ return ledgerEntryName(a).localeCompare(ledgerEntryName(b), undefined, {sensitivity:'base'}); });
+        else if (s === 'name-za') arr.sort(function(a,b){ return ledgerEntryName(b).localeCompare(ledgerEntryName(a), undefined, {sensitivity:'base'}); });
+        else if (s === 'amount') arr.sort(function(a,b){ return (b.amount||0) - (a.amount||0); });
+        else arr.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+        return arr;
+    }
     let donors     = JSON.parse(safeStorage.getItem('ssmvp_donors')   || '[]');
     let vendors    = JSON.parse(safeStorage.getItem('ssmvp_vendors')  || '[]');
     let santos     = JSON.parse(safeStorage.getItem('ssmvp_santos')   || '[{"id":"SAN_001","name":"P.P. Gyanjivandasji Swami","title":"Vadtal Dham"},{"id":"SAN_002","name":"P.P. Bhaktiharidasji Swami","title":"Vadtal Dham"}]');
@@ -1915,7 +1904,7 @@
         <p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.85;color:#4A5568;">
           Thank you for your generous donation of <strong style="color:#8B1A1A;">{amount}</strong> to
           <strong style="color:#1A202C;">Shree Swaminarayan Mandir Vadtaldham Perth</strong> on
-          <strong style="color:#1A202C;">{date}</strong>. We are truly grateful for your kind Support to the Community.
+          <strong style="color:#1A202C;">{date}</strong>. We are truly grateful for your kind support of our community.
         </p>
         <p style="margin:0 0 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.85;color:#4A5568;">
           Your receipt <strong style="color:#1A202C;">({receipt_number})</strong> is attached to this email.
@@ -2047,7 +2036,7 @@
     // ====================== HELPERS ======================
     function findOrCreateDonor(firstName, lastName, email, phone) {
         let donor = donors.find(d =>
-            (email && d.email && d.email.toLowerCase() === email.toLowerCase()) ||
+            d.email.toLowerCase() === (email || '').toLowerCase() ||
             (d.firstName.toLowerCase() === firstName.toLowerCase() && d.lastName.toLowerCase() === lastName.toLowerCase())
         );
         if (!donor) {
@@ -2059,7 +2048,7 @@
 
     function findOrCreateVendor(name, email, phone) {
         let vendor = vendors.find(v =>
-            (email && v.email && v.email.toLowerCase() === email.toLowerCase()) ||
+            v.email.toLowerCase() === (email || '').toLowerCase() ||
             v.name.toLowerCase() === name.toLowerCase()
         );
         if (!vendor) {
@@ -2080,10 +2069,6 @@
         if (dd) dd.value = _now.toLocaleDateString('en-CA', _perthTZ); // YYYY-MM-DD in Perth
         const dt2 = document.getElementById('in-donation-time');
         if (dt2) dt2.value = _now.toLocaleTimeString('en-AU', { ..._perthTZ, hour: '2-digit', minute: '2-digit', hour12: false });
-        const exd = document.getElementById('ex-date');
-        if (exd) exd.value = _now.toLocaleDateString('en-CA', _perthTZ);
-        const ext = document.getElementById('ex-time');
-        if (ext) ext.value = _now.toLocaleTimeString('en-AU', { ..._perthTZ, hour: '2-digit', minute: '2-digit', hour12: false });
         populateCategories('income');
         populateCategories('expense');
         updateSubcats('income');
@@ -2361,19 +2346,18 @@
         if (!document.getElementById(`${prefix}-method`).value) { showToast('Please select a payment method.', 'red'); return; }
 
         const now = new Date();
-        const _dateEl = document.getElementById(type === 'income' ? 'in-donation-date' : 'ex-date');
-        const _timeEl = document.getElementById(type === 'income' ? 'in-donation-time' : 'ex-time');
+        const donationDateEl  = document.getElementById('in-donation-date');
+        const donationTimeEl  = document.getElementById('in-donation-time');
+        // Build Perth-local date/time string YYYY-MM-DD in Perth timezone
         const todayPerth = now.toLocaleDateString('en-CA', { timeZone: 'Australia/Perth' });
-        const pickedDate = (_dateEl && _dateEl.value) ? _dateEl.value : null;   // YYYY-MM-DD
-        const pickedTime = (_timeEl && _timeEl.value) ? _timeEl.value : null;   // HH:MM
-        const isBackdated = pickedDate && (pickedDate !== todayPerth);
+        const donationDateVal = (type === 'income' && donationDateEl && donationDateEl.value) ? donationDateEl.value : null;
+        const isBackdated = donationDateVal && (donationDateVal !== todayPerth);
         let entryDate;
         if (isBackdated) {
-            // Backdated entry — use the chosen time (or Perth noon if none), in Perth time.
-            const _t = (pickedTime && /^\d{2}:\d{2}/.test(pickedTime)) ? (pickedTime.length === 5 ? pickedTime + ':00' : pickedTime) : '12:00:00';
-            entryDate = new Date(pickedDate + 'T' + _t + '+08:00');
+            // Backdated entry — use Perth noon so the date is correct
+            entryDate = new Date(donationDateVal + 'T12:00:00+08:00');
         } else {
-            // Today's entry — use the actual current moment (real time).
+            // Today's entry — use actual current moment (has real time)
             entryDate = now;
         }
         const entry = {
@@ -2400,7 +2384,7 @@
                 const orgContact = document.getElementById('in-org-contact').value.trim();
                 if (!orgName)  { showToast('Please enter the Organisation Name.', 'red'); return; }
                 if (!orgEmail) { showToast('Please enter the Organisation Email.', 'red'); return; }
-                if (!orgAbn)   { showToast('Please enter the ABN.', 'red'); return; }
+                // ABN is optional for organisation donations (mandatory check removed)
 
                 let org = null;
                 const linkedId = document.getElementById('in-org-id').value;
@@ -2452,6 +2436,7 @@
                 if (!phone) { showToast('Please enter the donor\'s Phone Number.', 'red'); return; }
                 if (!email || !/\S+@\S+\.\S+/.test(email)) { showToast('Please enter a valid Email Address.', 'red'); return; }
 
+                entry.inHonourOf = (document.getElementById('in-honour-of') ? document.getElementById('in-honour-of').value.trim() : '');
                 const donor = findOrCreateDonor(fname, lname, email, phone);
                 entry.donorId   = donor.id;
                 entry.firstName = donor.firstName;
@@ -2531,10 +2516,6 @@
         if (rdd) rdd.value = _rnow.toLocaleDateString('en-CA', _rptz);
         const rdt = document.getElementById('in-donation-time');
         if (rdt) rdt.value = _rnow.toLocaleTimeString('en-AU', { ..._rptz, hour: '2-digit', minute: '2-digit', hour12: false });
-        const rxd = document.getElementById('ex-date');
-        if (rxd) rxd.value = _rnow.toLocaleDateString('en-CA', _rptz);
-        const rxt = document.getElementById('ex-time');
-        if (rxt) rxt.value = _rnow.toLocaleTimeString('en-AU', { ..._rptz, hour: '2-digit', minute: '2-digit', hour12: false });
         setDonorType('individual');
         ['in-address','in-suburb','in-postcode','in-xero-ref',
          'in-org-address','in-org-suburb','in-org-postcode','in-org-xero',
@@ -2671,20 +2652,6 @@
         }
     }
 
-    // ── Delete a directory row from the Sheet (donor / vendor / org / sant) ──
-    async function deleteRowFromCloud(target, rowId) {
-        if (!syncConfig.enabled || !syncConfig.url) return;
-        try {
-            await fetch(syncConfig.url, {
-                method:  'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body:    JSON.stringify({ tab: '__delete_row__', target: target, rowId: String(rowId), key: await authToken() })
-            });
-        } catch (err) {
-            console.error('Cloud delete failed:', err);
-        }
-    }
-
     // ── Main entry push (Donations / Expenses) ──
     async function pushToCloud(entry) {
         if (!syncConfig.enabled || !syncConfig.url) return;
@@ -2692,7 +2659,7 @@
         const dt = new Date(entry.date);
         // Always format in Perth timezone (AWST = UTC+8, no DST)
         const perthTZ = { timeZone: 'Australia/Perth' };
-        const date    = dt.toLocaleDateString('en-CA', perthTZ) + 'T' + dt.toLocaleTimeString('en-GB', { ...perthTZ, hour12: false }) + '+08:00';   // Perth-local timestamp so the entry time survives a reload
+        const date    = dt.toLocaleDateString('en-AU', perthTZ);
         const time    = dt.toLocaleTimeString('en-AU', { ...perthTZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
         let payload;
@@ -2721,6 +2688,7 @@
                 amount:       entry.amount.toFixed(2),
                 method:       entry.method       || '',
                 reference:    entry.ref          || '',
+                inHonourOf:   entry.inHonourOf   || '',
                 recordedBy:   entry.recordedBy   || (currentUser ? currentUser.name : 'Unknown')
             };
         } else {
@@ -2834,7 +2802,7 @@ table.items tfoot td{padding:12px 16px;font-size:13px}
 <hr class="rule">
 <div class="info-row">
 <div class="billed">
-<div class="billed-lbl">Issued To</div>
+<div class="billed-lbl">Billed To</div>
 <div class="billed-name">${escHtml(d.donorName)}</div>
 <div class="billed-addr">${d.addrLines.map(l=>escHtml(l)).join('<br>')}</div>
 ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top:8px">Account Number: ${escHtml(String(d.entry.accountNumber))}</div>` : ''}
@@ -2854,6 +2822,8 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 <tfoot>
 <tr class="row-sub"><td>Subtotal</td><td class="r">$${d.amount}</td></tr>
 <tr class="row-total"><td>TOTAL</td><td class="r">$${d.amount}</td></tr>
+<tr class="row-paid"><td>Amount Paid</td><td class="r">$${d.amount}</td></tr>
+<tr class="row-due"><td>Amount Due</td><td class="r">$0.00</td></tr>
 </tfoot>
 </table>
 <hr class="rule" style="margin-top:28px">
@@ -2901,7 +2871,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         // Billed To + Meta
         const infoY = y;
         doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...LIGHT);
-        doc.text('ISSUED TO', ml, y); y+=6;
+        doc.text('BILLED TO', ml, y); y+=6;
         doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...DARK);
         doc.text(d.donorName, ml, y); y+=5.5;
         doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...MUTED);
@@ -2931,7 +2901,9 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 
         // Summary rows
         [{lbl:'Subtotal',val:'$'+d.amount,bold:false,col:MUTED,lc:[226,232,240],lw:0.3,line:true},
-         {lbl:'TOTAL',val:'$'+d.amount,bold:true,col:RED,lc:RED,lw:0.6,line:true}
+         {lbl:'TOTAL',val:'$'+d.amount,bold:true,col:RED,lc:RED,lw:0.6,line:true},
+         {lbl:'Amount Paid',val:'$'+d.amount,bold:false,col:MUTED,lc:null,lw:0,line:false},
+         {lbl:'Amount Due',val:'$0.00',bold:true,col:DARK,lc:DARK,lw:0.6,line:true}
         ].forEach(row => {
             if (row.line&&row.lc){ doc.setDrawColor(...row.lc); doc.setLineWidth(row.lw); doc.line(ml,y,W-mr,y); }
             y+=7; doc.setFont('helvetica',row.bold?'bold':'normal'); doc.setFontSize(row.bold?12:10.5); doc.setTextColor(...row.col);
@@ -2998,6 +2970,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
             '{category}':      entry.category   || '',
             '{subcategory}':   entry.subcategory|| '',
             '{method}':        entry.method     || '',
+            '{in_honour_of}':  entry.inHonourOf || '',
             '{receipt_number}':invoiceNo
         };
         Object.entries(replacements).forEach(([k, v]) => {
@@ -3097,6 +3070,32 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
             lucide.createIcons();
             return;
         }
+        applyDirSort(filtered, 'donors', function(d){ return (d.firstName||'') + ' ' + (d.lastName||''); }, function(d){ return d.firstAdded; });
+        grid.className = (dirView.donors === 'list') ? 'flex flex-col gap-2.5' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+        if (dirView.donors === 'list') {
+            filtered.forEach(d => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4 bg-white rounded-2xl border border-slate-100 px-5 py-3.5 hover:border-slate-200 transition-all';
+                row.innerHTML = `
+                    <div class="w-10 h-10 shrink-0 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-black text-sm">${escHtml((d.firstName||'').charAt(0))}${escHtml((d.lastName||'').charAt(0))}</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-sm truncate">${escHtml(d.firstName)} ${escHtml(d.lastName)}</div>
+                        <div class="text-xs text-slate-400 truncate">${escHtml(d.email) || escHtml(d.phone) || 'No contact'}</div>
+                    </div>
+                    <div class="text-right shrink-0 hidden sm:block">
+                        <div class="font-black text-sm text-slate-900">$${(d.total||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                        <div class="text-[10px] text-slate-400 font-semibold">${d.count||0} donation${(d.count||0)!==1?'s':''}</div>
+                    </div>
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="openDonorModal('${d.id}')" title="Edit donor" class="bg-slate-100 hover:bg-amber-50 hover:text-amber-600 text-slate-600 p-2 rounded-lg transition-all"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="deleteDonor('${d.id}')" title="Remove donor" class="bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 p-2 rounded-lg transition-all"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="prefillDonation('${d.id}')" title="New donation" class="bg-slate-950 hover:bg-orange-500 text-white p-2 rounded-lg transition-all"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i></button>
+                    </div>`;
+                grid.appendChild(row);
+            });
+            lucide.createIcons();
+            return;
+        }
         filtered.forEach(d => {
             const card = document.createElement('div');
             card.className = "card bg-white rounded-3xl border border-slate-100 overflow-hidden";
@@ -3171,6 +3170,32 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
                     <i data-lucide="plus" class="w-4 h-4"></i> Add First Vendor
                 </button>
             </div>`;
+            lucide.createIcons();
+            return;
+        }
+        applyDirSort(filtered, 'vendors', function(v){ return v.name; }, function(v){ return v.firstAdded; });
+        grid.className = (dirView.vendors === 'list') ? 'flex flex-col gap-2.5' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+        if (dirView.vendors === 'list') {
+            filtered.forEach(v => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4 bg-white rounded-2xl border border-slate-100 px-5 py-3.5 hover:border-slate-200 transition-all';
+                row.innerHTML = `
+                    <div class="w-10 h-10 shrink-0 bg-red-100 text-red-600 rounded-xl flex items-center justify-center font-black text-sm">${escHtml((v.name||'?').charAt(0).toUpperCase())}</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-sm truncate">${escHtml(v.name)}</div>
+                        <div class="text-xs text-slate-400 truncate">${escHtml(v.email) || escHtml(v.phone) || 'No contact'}</div>
+                    </div>
+                    <div class="text-right shrink-0 hidden sm:block">
+                        <div class="font-black text-sm text-slate-900">$${(v.total||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                        <div class="text-[10px] text-slate-400 font-semibold">${v.count||0} transaction${(v.count||0)!==1?'s':''}</div>
+                    </div>
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="openVendorModal('${v.id}')" title="Edit vendor" class="bg-slate-100 hover:bg-amber-50 hover:text-amber-600 text-slate-600 p-2 rounded-lg transition-all"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="deleteVendor('${v.id}')" title="Remove vendor" class="bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 p-2 rounded-lg transition-all"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="prefillExpense('${v.id}')" title="New expense" class="bg-slate-950 hover:bg-red-500 text-white p-2 rounded-lg transition-all"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i></button>
+                    </div>`;
+                grid.appendChild(row);
+            });
             lucide.createIcons();
             return;
         }
@@ -3455,23 +3480,16 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
     }
 
     function clearDonorAutofill() {
-        ['in-fname','in-lname','in-phone','in-email','in-address','in-suburb','in-postcode','in-xero-ref'].forEach(id => {
-            const el = document.getElementById(id); if (el) el.value = '';
-        });
+        document.getElementById('in-fname').value  = '';
+        document.getElementById('in-lname').value  = '';
+        document.getElementById('in-phone').value  = '';
+        document.getElementById('in-email').value  = '';
         if (document.getElementById('donor-smart-search'))
             document.getElementById('donor-smart-search').value = '';
         const banner = document.getElementById('donor-autofill-banner');
-        if (banner) { banner.classList.add('hidden'); banner.classList.remove('flex'); }
+        banner.classList.add('hidden');
+        banner.classList.remove('flex');
         document.getElementById('in-fname').focus();
-    }
-
-    // When the donor's name is cleared, drop the linked details that were auto-filled with it.
-    function clearDonorLinkedFields() {
-        ['in-lname','in-phone','in-email','in-address','in-suburb','in-postcode','in-xero-ref'].forEach(id => {
-            const el = document.getElementById(id); if (el) el.value = '';
-        });
-        const banner = document.getElementById('donor-autofill-banner');
-        if (banner) { banner.classList.add('hidden'); banner.classList.remove('flex'); }
     }
 
     // Called from Donor Directory "New Donation" button
@@ -3596,7 +3614,6 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         const sant = santos.find(s => s.id === id);
         if (!confirm("Delete this Sant?")) return;
         santos = santos.filter(s => s.id !== id);
-        deleteRowFromCloud('Santas', String(id));
         saveToStorage();
         renderSantos();
         audit('sant_deleted', `Deleted Sant "${sant ? sant.name : id}"`);
@@ -3604,217 +3621,6 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
     }
 
     // ====================== LEDGER ======================
-    // ====================== DIRECTORY EXPORT (Donors / Vendors / Organisations) ======================
-    function directoryRows(kind) {
-        if (kind === 'Donors') return donors.map(function (d) { return {
-            'Donor ID': d.id, 'First Name': d.firstName || '', 'Last Name': d.lastName || '',
-            Email: d.email || '', Phone: d.phone || '', Address: d.address || '', Suburb: d.suburb || '',
-            Postcode: d.postcode || '', 'Xero Ref': d.xeroRef || '',
-            'Total Donated': Number(d.total || 0), 'Donations': Number(d.count || 0) }; });
-        if (kind === 'Vendors') return vendors.map(function (v) { return {
-            'Vendor ID': v.id, 'Vendor Name': v.name || '', Email: v.email || '', Phone: v.phone || '',
-            Address: v.address || '', Suburb: v.suburb || '', Postcode: v.postcode || '',
-            'Total Paid': Number(v.total || 0), 'Payments': Number(v.count || 0) }; });
-        if (kind === 'Organisations') return orgs.map(function (o) { return {
-            'Org ID': o.id, Name: o.name || '', ABN: o.abn || '', 'Contact Person': o.contactPerson || '',
-            Email: o.email || '', Phone: o.phone || '', Address: o.address || '', Suburb: o.suburb || '',
-            Postcode: o.postcode || '', 'Xero Ref': o.xeroRef || '',
-            'Total Donated': Number(o.total || 0), 'Donations': Number(o.count || 0) }; });
-        return [];
-    }
-    function directoryFileName(kind, ext) {
-        const d = new Date(); const p = function (n) { return ('0' + n).slice(-2); };
-        return 'SSMVP_' + kind + '_' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '.' + ext;
-    }
-    function exportDirCSV(kind) {
-        const rows = directoryRows(kind);
-        if (!rows.length) { showToast('Nothing to export yet.', 'amber'); return; }
-        const headers = Object.keys(rows[0]);
-        const esc = function (v) { v = (v == null) ? '' : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-        const csv = [headers.join(',')].concat(rows.map(function (r) { return headers.map(function (h) { return esc(r[h]); }).join(','); })).join('\r\n');
-        ledgerDownloadBlob('﻿' + csv, directoryFileName(kind, 'csv'), 'text/csv;charset=utf-8');
-        showToast(kind + ' exported to CSV (' + rows.length + ' rows).', 'emerald');
-    }
-    function exportDirExcel(kind) {
-        const rows = directoryRows(kind);
-        if (!rows.length) { showToast('Nothing to export yet.', 'amber'); return; }
-        if (typeof XLSX === 'undefined') { showToast('Excel library is still loading - try again in a moment.', 'amber'); return; }
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, kind);
-        XLSX.writeFile(wb, directoryFileName(kind, 'xlsx'));
-        showToast(kind + ' exported to Excel (' + rows.length + ' rows).', 'emerald');
-    }
-    function exportDirPDF(kind) {
-        const rows = directoryRows(kind);
-        if (!rows.length) { showToast('Nothing to export yet.', 'amber'); return; }
-        if (!window.jspdf || !window.jspdf.jsPDF) { showToast('PDF library is still loading - try again in a moment.', 'amber'); return; }
-        const JsPDF = window.jspdf.jsPDF;
-        const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        doc.setFontSize(16); doc.setFont(undefined, 'bold'); doc.text('SSMVP - ' + kind, 14, 15);
-        doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(110);
-        doc.text('Generated: ' + new Date().toLocaleString('en-AU') + '    |    ' + rows.length + ' records', 14, 21);
-        doc.setTextColor(0);
-        const headers = Object.keys(rows[0]);
-        const body = rows.map(function (r) { return headers.map(function (h) { return (r[h] == null ? '' : String(r[h])); }); });
-        doc.autoTable({ startY: 26, head: [headers], body: body, styles: { fontSize: 7, cellPadding: 1.5 }, headStyles: { fillColor: [15, 23, 42] }, alternateRowStyles: { fillColor: [248, 250, 252] } });
-        doc.save(directoryFileName(kind, 'pdf'));
-        showToast(kind + ' exported to PDF (' + rows.length + ' rows).', 'emerald');
-    }
-
-    // ====================== LEDGER EXPORT (PDF / CSV / Excel) ======================
-    // Mirrors the on-screen ledger filters so an export always matches what is shown.
-    function getLedgerFilteredForExport() {
-        const period     = document.getElementById('report-period').value;
-        const typeFilter = document.getElementById('report-type').value;
-        const from       = document.getElementById('date-from').value;
-        const to         = document.getElementById('date-to').value;
-        const showVoided = !!(document.getElementById('show-voided') && document.getElementById('show-voided').checked);
-
-        let filtered = entries.slice();
-        if (!showVoided) filtered = filtered.filter(e => !e.voided);
-        if (typeFilter !== 'all') filtered = filtered.filter(e => e.type === typeFilter);
-
-        const now = new Date();
-        if (period !== 'all' && period !== 'custom') {
-            filtered = filtered.filter(e => {
-                const d = new Date(e.date);
-                if (period === 'today')   return d.toDateString() === now.toDateString();
-                if (period === 'week')    { const s = new Date(now); s.setDate(now.getDate() - now.getDay()); return d >= s; }
-                if (period === 'month')   return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                if (period === 'quarter') { const q = Math.floor(now.getMonth()/3); return Math.floor(d.getMonth()/3) === q && d.getFullYear() === now.getFullYear(); }
-                if (period === 'year')    return d.getFullYear() === now.getFullYear();
-                if (period === 'fy2425')  return d >= new Date('2024-07-01') && d < new Date('2025-07-01');
-                if (period === 'fy2526')  return d >= new Date('2025-07-01') && d < new Date('2026-07-01');
-                if (period === 'fy2627')  return d >= new Date('2026-07-01') && d < new Date('2027-07-01');
-                return true;
-            });
-        } else if (period === 'custom' && from && to) {
-            filtered = filtered.filter(e => { const d = new Date(e.date); return d >= new Date(from) && d <= new Date(to); });
-        }
-
-        const labels = { today:'Today', week:'This Week', month:'This Month', quarter:'This Quarter', year:'This Year',
-                         fy2425:'FY 2024-25', fy2526:'FY 2025-26', fy2627:'FY 2026-27', all:'All Time',
-                         custom: (from && to) ? (from + ' to ' + to) : 'Custom Range' };
-        const typeLabel = typeFilter === 'income' ? 'Donations only' : (typeFilter === 'expense' ? 'Expenses only' : 'All transactions');
-        return { filtered: filtered, periodLabel: labels[period] || 'All Time', typeLabel: typeLabel };
-    }
-
-    function ledgerEntityName(e) {
-        if (e.type === 'income') {
-            return e.donorType === 'org' ? (e.orgName || e.firstName || '') : ((e.firstName || '') + ' ' + (e.lastName || '')).trim();
-        }
-        return e.vendorName || '';
-    }
-
-    function ledgerExportRows() {
-        return getLedgerFilteredForExport().filtered.map(function (e) {
-            return {
-                Date:              new Date(e.date).toLocaleDateString('en-AU'),
-                Time:              new Date(e.date).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }),
-                Type:              e.type === 'income' ? 'Donation' : 'Expense',
-                'Entity / Vendor': ledgerEntityName(e),
-                Contact:           e.type === 'income' ? (e.email || '') : (e.phone || ''),
-                Category:          e.category || '',
-                Subcategory:       e.subcategory || '',
-                Method:            e.method || '',
-                Reference:         e.ref || '',
-                Amount:            Number((e.type === 'income' ? 1 : -1) * (Number(e.amount) || 0)),
-                Status:            e.voided ? 'Voided' : 'Active',
-                'Recorded By':     e.recordedBy || ''
-            };
-        });
-    }
-
-    function ledgerFileName(ext) {
-        const d = new Date();
-        const pad = function (n) { return ('0' + n).slice(-2); };
-        return 'SSMVP_Ledger_' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.' + ext;
-    }
-
-    function ledgerDownloadBlob(content, filename, mime) {
-        const blob = new Blob([content], { type: mime });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href = url; a.download = filename;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-    }
-
-    function ledgerLogExport(kind, n, periodLabel) {
-        try { audit('export_ledger', 'Ledger exported to ' + kind, n + ' rows | ' + periodLabel); } catch (e) {}
-    }
-
-    function exportLedgerCSV() {
-        const rows = ledgerExportRows();
-        if (!rows.length) { showToast('No transactions to export for this period.', 'amber'); return; }
-        const headers = Object.keys(rows[0]);
-        const esc = function (v) { v = (v === null || v === undefined) ? '' : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-        const csv = [headers.join(',')].concat(rows.map(function (r) { return headers.map(function (h) { return esc(r[h]); }).join(','); })).join('\r\n');
-        const meta = getLedgerFilteredForExport();
-        ledgerDownloadBlob('﻿' + csv, ledgerFileName('csv'), 'text/csv;charset=utf-8');
-        ledgerLogExport('CSV', rows.length, meta.periodLabel);
-        showToast('Ledger exported to CSV (' + rows.length + ' rows).', 'emerald');
-    }
-
-    function exportLedgerExcel() {
-        const rows = ledgerExportRows();
-        if (!rows.length) { showToast('No transactions to export for this period.', 'amber'); return; }
-        if (typeof XLSX === 'undefined') { showToast('Excel library is still loading - please try again in a moment.', 'amber'); return; }
-        const ws = XLSX.utils.json_to_sheet(rows);
-        ws['!cols'] = [{wch:11},{wch:7},{wch:10},{wch:24},{wch:22},{wch:16},{wch:16},{wch:12},{wch:14},{wch:11},{wch:9},{wch:16}];
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Ledger');
-        XLSX.writeFile(wb, ledgerFileName('xlsx'));
-        const meta = getLedgerFilteredForExport();
-        ledgerLogExport('Excel', rows.length, meta.periodLabel);
-        showToast('Ledger exported to Excel (' + rows.length + ' rows).', 'emerald');
-    }
-
-    function exportLedgerPDF() {
-        const meta = getLedgerFilteredForExport();
-        const list = meta.filtered;
-        if (!list.length) { showToast('No transactions to export for this period.', 'amber'); return; }
-        if (!window.jspdf || !window.jspdf.jsPDF) { showToast('PDF library is still loading - please try again in a moment.', 'amber'); return; }
-        const JsPDF = window.jspdf.jsPDF;
-        const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
-        doc.setFontSize(16); doc.setFont(undefined, 'bold');
-        doc.text('SSMVP - Financial Ledger', 14, 15);
-        doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(110);
-        doc.text('Period: ' + meta.periodLabel + '    |    ' + meta.typeLabel + '    |    Generated: ' + new Date().toLocaleString('en-AU'), 14, 21);
-        doc.setTextColor(0);
-
-        const body = list.map(function (e) {
-            return [
-                new Date(e.date).toLocaleDateString('en-AU'),
-                e.type === 'income' ? 'Donation' : 'Expense',
-                ledgerEntityName(e),
-                (e.category || '') + (e.subcategory ? ' / ' + e.subcategory : ''),
-                e.method || '',
-                (e.type === 'income' ? '+' : '-') + '$' + (Number(e.amount) || 0).toFixed(2),
-                e.voided ? 'Voided' : ''
-            ];
-        });
-        const income  = list.filter(function (e) { return !e.voided && e.type === 'income';  }).reduce(function (a, c) { return a + (Number(c.amount) || 0); }, 0);
-        const expense = list.filter(function (e) { return !e.voided && e.type === 'expense'; }).reduce(function (a, c) { return a + (Number(c.amount) || 0); }, 0);
-
-        doc.autoTable({
-            startY: 26,
-            head: [['Date', 'Type', 'Entity / Vendor', 'Classification', 'Method', 'Amount', 'Status']],
-            body: body,
-            styles: { fontSize: 8, cellPadding: 1.8 },
-            headStyles: { fillColor: [15, 23, 42] },
-            columnStyles: { 5: { halign: 'right' } },
-            alternateRowStyles: { fillColor: [248, 250, 252] }
-        });
-        const y = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 30) + 8;
-        doc.setFont(undefined, 'bold'); doc.setFontSize(10);
-        doc.text('Income: $' + income.toFixed(2) + '       Expense: $' + expense.toFixed(2) + '       Net: $' + (income - expense).toFixed(2), 14, y);
-        doc.save(ledgerFileName('pdf'));
-        ledgerLogExport('PDF', list.length, meta.periodLabel);
-        showToast('Ledger exported to PDF (' + list.length + ' rows).', 'emerald');
-    }
-
     function renderLedger() {
         const period      = document.getElementById('report-period').value;
         const typeFilter  = document.getElementById('report-type').value;
@@ -3845,6 +3651,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
             filtered = filtered.filter(e => { const d = new Date(e.date); return d >= new Date(from) && d <= new Date(to); });
         }
 
+        filtered = applyLedgerSort(filtered.slice());
         const body = document.getElementById('ledger-body');
         body.innerHTML = '';
         const isAdmin = currentUser && currentUser.role === 'admin';
@@ -3880,6 +3687,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
                                 : escHtml(e.vendorName || '—')}
                         </div>
                         <div class="text-xs text-slate-400">${e.type === 'income' ? (e.donorType === 'org' ? (e.orgAbn ? 'ABN: ' + escHtml(e.orgAbn) : (e.email || '')) : (e.email || '')) : (e.phone || '')}</div>
+                        ${e.type === 'income' && e.inHonourOf ? `<div class="text-xs text-pink-600 font-semibold mt-0.5">In honour of: ${escHtml(e.inHonourOf)}</div>` : ''}
                         ${e.type === 'expense' && e.paidBy ? `<div class="text-xs text-amber-600 font-semibold mt-0.5">Paid by: ${escHtml(e.paidBy)}${e.reimbursedTo && e.reimbursedTo !== e.paidBy ? ' → Reimburse: ' + escHtml(e.reimbursedTo) : ''}</div>` : ''}
                     </td>
                     <td class="px-8 py-5">
@@ -4310,38 +4118,9 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 
     // ====================== EMAIL + MFA ACCESS CONTROL ======================
 
-    // ── Password hashing: PBKDF2-HMAC-SHA256 with a per-user random salt ──
-    //  Stored format (self-describing): "pbkdf2$<iterations>$<saltB64>$<hashB64>".
-    //  Old SHA-256 hashes are still accepted at login and transparently upgraded.
-    const PBKDF2_ITERATIONS = 150000;
-    function _b64(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); }
-    function _unb64(s) { return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
-
-    async function hashPassword(pw, saltBytes) {
-        const salt = saltBytes || crypto.getRandomValues(new Uint8Array(16));
-        const km   = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), { name: 'PBKDF2' }, false, ['deriveBits']);
-        const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' }, km, 256);
-        return 'pbkdf2$' + PBKDF2_ITERATIONS + '$' + _b64(salt) + '$' + _b64(bits);
-    }
-
-    // Legacy SHA-256 hash (single shared salt) — only used to verify old stored hashes.
-    async function _legacyHash(pw) {
+    async function hashPassword(pw) {
         const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('ssmvp:' + pw));
-        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    function isLegacyHash(stored) { return !!stored && stored.indexOf('pbkdf2$') !== 0 && stored !== '__pending__'; }
-
-    // Verify a password against a stored hash of EITHER format.
-    async function verifyPassword(pw, stored) {
-        if (!stored || stored === '__pending__') return false;
-        if (stored.indexOf('pbkdf2$') === 0) {
-            const p    = stored.split('$');   // [pbkdf2, iters, salt, hash]
-            const km   = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), { name: 'PBKDF2' }, false, ['deriveBits']);
-            const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: _unb64(p[2]), iterations: parseInt(p[1], 10), hash: 'SHA-256' }, km, 256);
-            return _b64(bits) === p[3];
-        }
-        return (await _legacyHash(pw)) === stored;
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
     }
 
     // User accounts live centrally in the Google Sheet so logins work from any device.
@@ -4407,19 +4186,14 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (user.passwordHash === '__pending__') {
             errEl.textContent = 'This account is still initialising — please try again in a moment.'; errEl.style.display = 'block'; return;
         }
-        const passwordOk = await verifyPassword(pw, user.passwordHash);
-        if (!passwordOk) {
+        const hash = await hashPassword(pw);
+        if (hash !== user.passwordHash) {
             recordLoginFail(email);
             pushAuditEvent({ action: 'failed_login', summary: `Failed login for "${user.name}"`, detail: `Wrong password · Email: ${email}`, by: 'Anonymous', at: new Date().toISOString() });
             errEl.textContent = isLoginLocked(email)
                 ? `Too many failed attempts. Please wait ${lockoutMinutes(email)} minute${lockoutMinutes(email) !== 1 ? 's' : ''} and try again.`
                 : 'Incorrect password. Please try again.';
             errEl.style.display = 'block'; return;
-        }
-        // Transparent upgrade: re-hash any old SHA-256 password to PBKDF2 on successful login.
-        if (isLegacyHash(user.passwordHash)) {
-            user.passwordHash = await hashPassword(pw);
-            pushUserToCloud(user);
         }
         clearLoginFails(email);
         errEl.style.display = 'none';
@@ -4482,6 +4256,8 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (banner) banner.textContent = sent
             ? 'A 6-digit code has been emailed to you. It may take a moment to arrive.'
             : 'Could not email the code — check your connection and tap Resend, or use the Authenticator option instead.';
+        // Setup-time recovery hatch (NOT shown in the UI). Remove once email delivery is confirmed working.
+        console.log(`[SSMVP] Email OTP for ${user.email}: ${mfaCode}`);
         setTimeout(() => document.getElementById('mfa-code-input').focus(), 100);
     }
 
@@ -4578,6 +4354,8 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (banner) banner.textContent = sent
             ? 'A new code has been emailed to you.'
             : 'Could not email the code — check your connection, or use the Authenticator option instead.';
+        // Setup-time recovery hatch (NOT shown in the UI).
+        console.log(`[SSMVP] Email OTP for ${mfaTarget.email}: ${mfaCode}`);
         showToast(sent ? 'New code emailed.' : 'Could not send email.', sent ? 'emerald' : 'amber');
     }
 
@@ -4684,58 +4462,6 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
     }
 
     // ── Unlock ──
-    // ============ Sign in with Google (added) ============
-    const GOOGLE_CLIENT_ID = '98141857961-oj17uh8badn7unc43ssp7977jkfdqfju.apps.googleusercontent.com';
-
-    function initGoogleSignIn() {
-        const el = document.getElementById('google-signin-btn');
-        if (!window.google || !google.accounts || !google.accounts.id || !el) {
-            return void setTimeout(initGoogleSignIn, 300);  // wait for the Google library + DOM
-        }
-        try {
-            google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
-            google.accounts.id.renderButton(el, { theme: 'filled_blue', size: 'large', shape: 'pill', text: 'signin_with' });
-        } catch (e) {
-            console.error('Google sign-in init failed:', e);
-        }
-    }
-
-    async function handleGoogleCredential(response) {
-        const errEl = document.getElementById('google-signin-error');
-        if (errEl) errEl.style.display = 'none';
-        try {
-            if (!response || !response.credential) throw new Error('No credential returned by Google.');
-            if (!syncConfig.url) throw new Error('Backend not configured. Set the Apps Script URL in Settings first.');
-            const res = await fetch(syncConfig.url, {
-                method:  'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body:    JSON.stringify({ key: await authToken(), tab: '__google_auth__', idToken: response.credential })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!data || !data.ok) {
-                const map = {
-                    not_authorized:   'This Google account is not on the approved list. Ask an admin to add your email as a user.',
-                    aud_mismatch:     'Google sign-in is misconfigured (client ID mismatch). Contact the admin.',
-                    email_unverified: 'Your Google email address is not verified.',
-                    bad_token:        'Could not verify your Google sign-in. Please try again.'
-                };
-                throw new Error(map[data && data.error] || 'Google sign-in could not be verified.');
-            }
-            const email = String(data.email || '').toLowerCase();
-            await loadUsersFromCloud();
-            const user = appUsers.find(u => String(u.email).toLowerCase() === email);
-            if (!user) throw new Error('This Google account is not on the approved list. Ask an admin to add your email as a user.');
-            clearLoginFails(email);
-            unlockApp(user);   // Google verified identity (with its own 2FA) -- skip password + OTP.
-        } catch (err) {
-            console.error('Google sign-in failed:', err);
-            if (errEl) { errEl.textContent = err.message || 'Google sign-in failed.'; errEl.style.display = 'block'; }
-        }
-    }
-
-    // Start the Google button as soon as the library + DOM are ready.
-    initGoogleSignIn();
-
     async function unlockApp(user) {
         currentUser = user;
         document.getElementById('login-screen').classList.add('hidden');
@@ -5147,6 +4873,32 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
             lucide.createIcons(); return;
         }
 
+        applyDirSort(filtered, 'orgs', function(o){ return o.name; }, function(o){ return o.firstAdded; });
+        grid.className = (dirView.orgs === 'list') ? 'flex flex-col gap-2.5' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+        if (dirView.orgs === 'list') {
+            filtered.forEach(o => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4 bg-white rounded-2xl border border-slate-100 px-5 py-3.5 hover:border-slate-200 transition-all';
+                row.innerHTML = `
+                    <div class="w-10 h-10 shrink-0 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-black text-sm">${escHtml((o.name||'?').charAt(0).toUpperCase())}</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-sm truncate">${escHtml(o.name)}</div>
+                        <div class="text-xs text-slate-400 truncate">${o.abn ? 'ABN: ' + escHtml(o.abn) : (escHtml(o.email) || escHtml(o.contactPerson) || 'No details')}</div>
+                    </div>
+                    <div class="text-right shrink-0 hidden sm:block">
+                        <div class="font-black text-sm text-slate-900">$${(o.total||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+                        <div class="text-[10px] text-slate-400 font-semibold">${o.count||0} donation${(o.count||0)!==1?'s':''}</div>
+                    </div>
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="openOrgModal('${o.id}')" title="Edit organisation" class="bg-slate-100 hover:bg-amber-50 hover:text-amber-600 text-slate-600 p-2 rounded-lg transition-all"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="deleteOrg('${o.id}')" title="Remove organisation" class="bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 p-2 rounded-lg transition-all"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="prefillOrgDonation('${o.id}')" title="New donation" class="bg-slate-950 hover:bg-indigo-500 text-white p-2 rounded-lg transition-all"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i></button>
+                    </div>`;
+                grid.appendChild(row);
+            });
+            lucide.createIcons();
+            return;
+        }
         filtered.forEach(o => {
             const total = o.total || 0;
             const count = o.count || 0;
@@ -5273,10 +5025,8 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
 
     function deleteOrg(id) {
         const o = orgs.find(x => x.id === id);
-        if (!o) return;
         if (!confirm(`Remove "${o.name}" from the Organisation Directory?`)) return;
         orgs = orgs.filter(x => x.id !== id);
-        deleteRowFromCloud('Organisations', id);
         saveToStorage();
         renderOrgs();
         audit('org_deleted', `Deleted organisation "${o.name}"`, `ABN: ${o.abn || 'N/A'} · Email: ${o.email || 'N/A'}`);
@@ -5296,16 +5046,7 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
             .replace(/{category}/g,      '[Category]')
             .replace(/{method}/g,        '[Method]')
             .replace(/{receipt_number}/g,'[RC-XXXXX]');
-        const win = window.open('', '_blank', 'width=720,height=900');
-        if (win) {
-            win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + escHtml(tmpl.subject) + '</title></head><body style="margin:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif">' +
-                '<div style="max-width:680px;margin:24px auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">' +
-                '<div style="background:#0f172a;color:#fff;padding:16px 24px;font-weight:700">' + escHtml(tmpl.subject) + '</div>' +
-                '<div style="padding:24px">' + body + '</div></div></body></html>');
-            win.document.close();
-        } else {
-            alert('Subject: ' + tmpl.subject + '\n\n' + body.replace(/<[^>]+>/g, ''));
-        }
+        alert(`Subject: ${tmpl.subject}\n\n${body}`);
     }
 
     // ====================== EMAIL TEMPLATES ======================
@@ -5453,7 +5194,6 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (!d) return;
         if (!confirm(`Remove "${d.firstName} ${d.lastName}" from the Donor Directory?\n\nThis will not delete their donation history.`)) return;
         donors = donors.filter(x => x.id !== id);
-        deleteRowFromCloud('Donors', id);
         saveToStorage();
         updateDonorDatalist();
         renderDonors();
@@ -6042,13 +5782,47 @@ ${d.entry.accountNumber ? `<div style="font-size:12px;font-weight:700;margin-top
         if (!v) return;
         if (!confirm(`Remove "${v.name}" from the Vendor Directory?\n\nThis will not delete their expense history.`)) return;
         vendors = vendors.filter(x => x.id !== id);
-        deleteRowFromCloud('Vendors', id);
         saveToStorage();
         updateVendorDatalist();
         renderVendors();
         audit('vendor_deleted', `Removed vendor "${v.name}"`, `Phone: ${v.phone}`);
         showToast(`Vendor removed.`, 'red');
     }
+
+    // Inject sort controls (directories + ledger) — A–Z default for directories.
+    (function(){
+        function mkSelect(opts, val, onChange){
+            var sel = document.createElement('select');
+            sel.className = 'custom-select text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-4 py-4 rounded-3xl cursor-pointer';
+            sel.style.border = '0';
+            sel.innerHTML = opts; sel.value = val;
+            sel.onchange = function(){ onChange(sel.value); };
+            return sel;
+        }
+        function addDirSort(searchId, which, renderFn){
+            try{
+                var inp = document.getElementById(searchId); if (!inp) return;
+                var wrap = inp.closest('.relative') || inp.parentNode;
+                var container = wrap.parentNode; if (!container) return;
+                if (container.querySelector('.dir-sort')) return;
+                var sw = document.createElement('div'); sw.className = 'dir-sort flex items-center gap-2';
+                sw.appendChild(mkSelect('<option value="cards">Cards</option><option value="list">List</option>', dirView[which]||'cards', function(v){ dirView[which]=v; renderFn(); }));
+                sw.appendChild(mkSelect('<option value="az">Name A–Z</option><option value="za">Name Z–A</option><option value="recent">Recently added</option>', dirSort[which]||'az', function(v){ dirSort[which]=v; renderFn(); }));
+                container.insertBefore(sw, wrap.nextSibling);
+            }catch(e){}
+        }
+        addDirSort('donor-search', 'donors', renderDonors);
+        addDirSort('org-search', 'orgs', renderOrgs);
+        addDirSort('vendor-search', 'vendors', renderVendors);
+        try{
+            var rt = document.getElementById('report-type');
+            if (rt && !document.getElementById('ledger-sort')){
+                var ls = mkSelect('<option value="date">Date (newest)</option><option value="name-az">Name A–Z</option><option value="name-za">Name Z–A</option><option value="amount">Amount (high→low)</option>', ledgerSort, function(v){ ledgerSort=v; renderLedger(); });
+                ls.id = 'ledger-sort';
+                rt.parentNode.insertBefore(ls, rt.nextSibling);
+            }
+        }catch(e){}
+    })();
 
     window.onload = init;
 </script>
